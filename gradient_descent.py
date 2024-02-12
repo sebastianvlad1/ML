@@ -1,10 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Initialise parameters
-# x = np.random.randn(10, 1)
-# y = 2*x + np.random.rand()
-
 x = np.array([32.50234527, 53.42680403, 61.53035803, 47.47563963, 59.81320787,
            55.14218841, 52.21179669, 39.29956669, 48.10504169, 52.55001444,
            45.41973014, 54.35163488, 44.1640495 , 58.16847072, 56.72720806,
@@ -17,13 +13,11 @@ y = np.array([31.70700585, 68.77759598, 62.5623823 , 71.54663223, 87.23092513,
 # Parameters
 w = 0.0
 b = 0.0
-
-#Hyperparameter
 learning_rate = 0.00001
 
-# Gradient descent func
+# Gradient descent
 def gradient_descent(x, y, w, b, learning_rate):
-    # calc derivatives of loss with respect ot the parameters
+    # calculate derivatives of the loss function with respect ot the parameters
     dldw = 0.0
     dldb = 0.0
 
@@ -51,7 +45,7 @@ for epoch in range(700):
 y_values_f1 = y
 y_values_f2 = w*x + b
 
-# Plot the functions
+# Plot the data
 plt.scatter(x, y_values_f1, label='data points')
 plt.plot(x, y_values_f2, label='linear regression')
 
