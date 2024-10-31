@@ -10,10 +10,10 @@ app = FastAPI()
 device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
 
 # Load BERT QA and Sentence-BERT models
-model_name = "bert-large-uncased-whole-word-masking-finetuned-squad"
+model_name = "./local_models/bert-large-uncased-whole-word-masking-finetuned-squad"
 qa_model = BertForQuestionAnswering.from_pretrained(model_name).to(device)
 tokenizer = BertTokenizer.from_pretrained(model_name)
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+embedding_model = SentenceTransformer('./local_models/all-MiniLM-L6-v2')
 corpus = [
     "BERT is a model developed by Google for natural language processing tasks.",
     "BERT stands for Bidirectional Encoder Representations from Transformers.",
@@ -60,6 +60,9 @@ async def ask_question(question: Question):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-#pip install fastapi uvicorn
-#uvicorn app:app --reload
+
+#python -m venv myenv
+#source myenv/bin/activate / windows myenv\Scripts\activate.bat
+#pip install -r requirements.txt
+#uvicorn Bert_Questioning_API:app --reload --port 8000
 #curl -X POST "http://127.0.0.1:8000/ask" -H "Content-Type: application/json" -d '{"question": "Who won the hackaton this year?"}'
