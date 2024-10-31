@@ -10,10 +10,10 @@ app = FastAPI()
 device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
 
 # Load BERT QA and Sentence-BERT models
-model_name = "./local_models/bert-large-uncased-whole-word-masking-finetuned-squad"
+model_name = "bert-large-uncased-whole-word-masking-finetuned-squad"
 qa_model = BertForQuestionAnswering.from_pretrained(model_name).to(device)
 tokenizer = BertTokenizer.from_pretrained(model_name)
-embedding_model = SentenceTransformer('./local_models/all-MiniLM-L6-v2')
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 corpus = [
     "BERT is a model developed by Google for natural language processing tasks.",
     "BERT stands for Bidirectional Encoder Representations from Transformers.",
