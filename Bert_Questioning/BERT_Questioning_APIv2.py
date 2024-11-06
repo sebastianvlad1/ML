@@ -4,20 +4,18 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sentence_transformers import util
 import json
+from config import DEVICE, MODEL_PATH, EMBEDDING_MODEL_PATH, FILE_PATH
 app = FastAPI()
 
-# Load model and device setup
-device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
-
 # Load BERT QA and Sentence-BERT models
-model_name = "bert-large-uncased-whole-word-masking-finetuned-squad"
-qa_model = BertForQuestionAnswering.from_pretrained(model_name).to(device)
-tokenizer = BertTokenizer.from_pretrained(model_name)
+qa_model = BertForQuestionAnswering.from_pretrained(MODEL_PATH).to(DEVICE)
+
+tokenizer = BertTokenizer.from_pretrained(MODEL_PATH)
 
 # Load transformer model and tokenizer for sentence embeddings
-embedding_model_name = './local_models/all-MiniLM-L6-v2'
-embedding_model = AutoModel.from_pretrained(embedding_model_name).to(device)
-embedding_tokenizer = AutoTokenizer.from_pretrained(embedding_model_name)
+embedding_model = AutoModel.from_pretrained(EMBEDDING_MODEL_PATH).to(DEVICE)
+
+embedding_tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL_PATH)
 
 def load_corpus(file_path):
     with open(file_path, "r") as f:
@@ -29,7 +27,7 @@ def get_max_pooled_embeddings(sentences):
     for sentence in sentences:
         with torch.no_grad():
             # Tokenize input
-            inputs = embedding_tokenizer(sentence, return_tensors="pt", truncation=True, padding=True).to(device)
+            inputs = embedding_tokenizer(sentence, return_tensors="pt", truncation=True, padding=True).to(DEVICE)
             # Get token embeddings
             outputs = embedding_model(**inputs)
             token_embeddings = outputs.last_hidden_state  # Shape: (1, seq_len, hidden_dim)
@@ -39,7 +37,7 @@ def get_max_pooled_embeddings(sentences):
     # Concatenate pooled embeddings into a single tensor
     return torch.cat(embeddings, dim=0)  # Shape: (num_sentences, hidden_dim)
 
-corpus = load_corpus(file_path="./corpus.json")
+corpus = load_corpus(file_path=FILE_PATH)
 # Compute max-pooled corpus embeddings
 corpus_embeddings = get_max_pooled_embeddings(corpus)
 
@@ -67,4 +65,4 @@ async def ask_question(question: Question):
 # source myenv/bin/activate / windows myenv\Scripts\activate.bat
 # pip install -r requirements.txt
 # uvicorn Bert_Questioning_API:app --reload --port 8000
-# curl -X POST "http://127.0.0.1:8000/ask" -H "Content-Type: application/json" -d '{"question": "Who won the hackaton this year?"}'
+# curl -X POST "http://127.0.0.1:8005/ask" -H "Content-Type: application/json" -d '{"question": "Who won the hackaton this year?"}'
