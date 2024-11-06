@@ -3,6 +3,7 @@ from transformers import BertForQuestionAnswering, BertTokenizer, AutoModel, Aut
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sentence_transformers import util
+import json
 app = FastAPI()
 
 # Load model and device setup
@@ -18,13 +19,9 @@ embedding_model_name = './local_models/all-MiniLM-L6-v2'
 embedding_model = AutoModel.from_pretrained(embedding_model_name).to(device)
 embedding_tokenizer = AutoTokenizer.from_pretrained(embedding_model_name)
 
-# Corpus data
-corpus = [
-    "BERT is a model developed by Google for natural language processing tasks.",
-    "BERT stands for Bidirectional Encoder Representations from Transformers.",
-    "It has significantly advanced the field of NLP by providing a pre-trained model.",
-    "Sebastian is the creator of this file and the winner of hackathon 2024, he is born in Oradea"
-]
+def load_corpus(file_path):
+    with open(file_path, "r") as f:
+        return json.load(f)
 
 # Custom function for max pooling embeddings
 def get_max_pooled_embeddings(sentences):
@@ -42,6 +39,7 @@ def get_max_pooled_embeddings(sentences):
     # Concatenate pooled embeddings into a single tensor
     return torch.cat(embeddings, dim=0)  # Shape: (num_sentences, hidden_dim)
 
+corpus = load_corpus(file_path="./corpus.json")
 # Compute max-pooled corpus embeddings
 corpus_embeddings = get_max_pooled_embeddings(corpus)
 
